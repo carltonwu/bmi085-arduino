@@ -21,45 +21,45 @@
 */
 
 
-#ifndef BMI088_h
-#define BMI088_h
+#ifndef BMI085_h
+#define BMI085_h
 
 #include "Arduino.h"
 #include "Wire.h"  // I2C library
 #include "SPI.h"   // SPI library
 
-class Bmi088Accel {
+class Bmi085Accel {
   public:
     enum Range {
-      RANGE_3G = 0x00,
-      RANGE_6G = 0x01,
-      RANGE_12G = 0x02,
-      RANGE_24G = 0x03
+      RANGE_2G = 0x00,
+      RANGE_4G = 0x01,
+      RANGE_8G = 0x02,
+      RANGE_16G = 0x03
     };
     enum Odr {
-      ODR_1600HZ_BW_280HZ,
-      ODR_1600HZ_BW_234HZ,
-      ODR_1600HZ_BW_145HZ,
-      ODR_800HZ_BW_230HZ,
-      ODR_800HZ_BW_140HZ,
+      ODR_1600HZ_BW_684HZ,
+      ODR_1600HZ_BW_324HZ,
+      ODR_1600HZ_BW_162HZ,
+      ODR_800HZ_BW_324HZ,
+      ODR_800HZ_BW_162HZ,
       ODR_800HZ_BW_80HZ,
-      ODR_400HZ_BW_145HZ,
-      ODR_400HZ_BW_75HZ,
-      ODR_400HZ_BW_40HZ,
+      ODR_400HZ_BW_162HZ,
+      ODR_400HZ_BW_80HZ,
+      ODR_400HZ_BW_41HZ,
       ODR_200HZ_BW_80HZ,
-      ODR_200HZ_BW_38HZ,
+      ODR_200HZ_BW_41HZ,
       ODR_200HZ_BW_20HZ,
       ODR_100HZ_BW_40HZ,
-      ODR_100HZ_BW_19HZ,
+      ODR_100HZ_BW_20HZ,
       ODR_100HZ_BW_10HZ,
       ODR_50HZ_BW_20HZ,
-      ODR_50HZ_BW_9HZ,
+      ODR_50HZ_BW_10HZ,
       ODR_50HZ_BW_5HZ,
       ODR_25HZ_BW_10HZ,
       ODR_25HZ_BW_5HZ,
       ODR_25HZ_BW_3HZ,
       ODR_12_5HZ_BW_5HZ,
-      ODR_12_5HZ_BW_2HZ,
+      ODR_12_5HZ_BW_3HZ,
       ODR_12_5HZ_BW_1HZ
     };
     enum PinMode {
@@ -70,8 +70,8 @@ class Bmi088Accel {
       ACTIVE_HIGH,
       ACTIVE_LOW
     };
-    Bmi088Accel(TwoWire &bus,uint8_t address);
-    Bmi088Accel(SPIClass &bus,uint8_t csPin);
+    Bmi085Accel(TwoWire &bus,uint8_t address);
+    Bmi085Accel(SPIClass &bus,uint8_t csPin);
     int begin();
     bool setOdr(Odr odr);
     bool setRange(Range range);
@@ -88,8 +88,8 @@ class Bmi088Accel {
     uint64_t getTime_ps();
     void estimateBias();
   private:
-    // allow class Bmi088 access to private members 
-    friend class Bmi088;
+    // allow class Bmi085 access to private members 
+    friend class Bmi085;
     // int pin input or output selection
     enum PinIO {
       PIN_INPUT,
@@ -108,7 +108,7 @@ class Bmi088Accel {
     // buffer for reading from sensor
     uint8_t _buffer[9];
     // constants
-    static const uint8_t ACC_CHIP_ID = 0x1E;
+    static const uint8_t ACC_CHIP_ID = 0x1F;
     static const uint8_t ACC_RESET_CMD = 0xB6;
     static const uint8_t ACC_ENABLE_CMD = 0x04;
     static const uint8_t ACC_DISABLE_CMD = 0x00;
@@ -204,7 +204,7 @@ class Bmi088Accel {
     void readRegisters(uint8_t subAddress, uint8_t count, uint8_t* dest);
 };
 
-class Bmi088Gyro {
+class Bmi085Gyro {
   public:
     enum Range {
       RANGE_2000DPS = 0x00,
@@ -231,8 +231,8 @@ class Bmi088Gyro {
       ACTIVE_HIGH,
       ACTIVE_LOW
     };
-    Bmi088Gyro(TwoWire &bus,uint8_t address);
-    Bmi088Gyro(SPIClass &bus,uint8_t csPin);
+    Bmi085Gyro(TwoWire &bus,uint8_t address);
+    Bmi085Gyro(SPIClass &bus,uint8_t csPin);
     int begin();
     bool setOdr(Odr odr);
     bool setRange(Range range);
@@ -330,7 +330,7 @@ class Bmi088Gyro {
     void readRegisters(uint8_t subAddress, uint8_t count, uint8_t* dest);
 };
 
-class Bmi088 {
+class Bmi085 {
   public:
     enum AccelRange {
       ACCEL_RANGE_3G,
@@ -366,8 +366,8 @@ class Bmi088 {
       ACTIVE_HIGH,
       ACTIVE_LOW
     };
-    Bmi088(TwoWire &bus,uint8_t accel_addr,uint8_t gyro_addr);
-    Bmi088(SPIClass &bus,uint8_t accel_cs,uint8_t gyro_cs);
+    Bmi085(TwoWire &bus,uint8_t accel_addr,uint8_t gyro_addr);
+    Bmi085(SPIClass &bus,uint8_t accel_cs,uint8_t gyro_cs);
     int begin();
     bool setOdr(Odr odr);
     bool setRange(AccelRange accel_range,GyroRange gyro_range);
@@ -384,8 +384,8 @@ class Bmi088 {
     float getGyroY_rads();
     float getGyroZ_rads();  
   private:
-    Bmi088Accel *accel;
-    Bmi088Gyro *gyro;
+    Bmi085Accel *accel;
+    Bmi085Gyro *gyro;
     uint8_t drdy_pin;
     // constants
     static const uint8_t ACC_DISABLE = 0;

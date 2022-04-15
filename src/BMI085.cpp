@@ -21,7 +21,7 @@
 */
 
 
-#include "BMI088.h"
+#include "BMI085.h"
 
 /* Macros to get and set register fields */
 #define GET_FIELD(regname,value) ((value & regname##_MASK) >> regname##_POS)
@@ -589,24 +589,24 @@ static const uint8_t bmi_feature_config[] = {
 0x80, 0x2E, 0x18, 0x00, 0xFD, 0x2D
 };
 
-/* BMI088 object, input the I2C bus and address */
-Bmi088Accel::Bmi088Accel(TwoWire &bus,uint8_t address)
+/* BMI085 object, input the I2C bus and address */
+Bmi085Accel::Bmi085Accel(TwoWire &bus,uint8_t address)
 {
   _i2c = &bus; // I2C bus
   _address = address; // I2C address
   _useSPI = false; // set to use I2C
 }
 
-/* BMI088 object, input the SPI bus and chip select pin */
-Bmi088Accel::Bmi088Accel(SPIClass &bus,uint8_t csPin)
+/* BMI085 object, input the SPI bus and chip select pin */
+Bmi085Accel::Bmi085Accel(SPIClass &bus,uint8_t csPin)
 {
   _spi = &bus; // SPI bus
   _csPin = csPin; // chip select pin
   _useSPI = true; // set to use SPI
 }
 
-/* begins communication with the BMI088 accel */
-int Bmi088Accel::begin()
+/* begins communication with the BMI085 accel */
+int Bmi085Accel::begin()
 {
   if (_useSPI) {
     // setting CS pin to output
@@ -650,11 +650,11 @@ int Bmi088Accel::begin()
   } 
   delay(50);
   /* set default range */
-  if (!setRange(RANGE_24G)) {
+  if (!setRange(RANGE_16G)) {
     return -7;
   }
   /* set default ODR */
-  if (!setOdr(ODR_1600HZ_BW_280HZ)) {
+  if (!setOdr(ODR_1600HZ_BW_684HZ)) {
     return -8;
   }
   /* check config errors */
@@ -668,28 +668,28 @@ int Bmi088Accel::begin()
   return 1;
 }
 
-/* sets the BMI088 output data rate */
-bool Bmi088Accel::setOdr(Odr odr)
+/* sets the BMI085 output data rate */
+bool Bmi085Accel::setOdr(Odr odr)
 {
   uint8_t writeReg = 0, readReg = 0, value;
   switch (odr) {
-    case ODR_1600HZ_BW_280HZ: {
+    case ODR_1600HZ_BW_684HZ: {
       value = (0x0A << 4) | 0x0C;
       break;
     }
-    case ODR_1600HZ_BW_234HZ: {
+    case ODR_1600HZ_BW_324HZ: {
       value = (0x09 << 4) | 0x0C;
       break;      
     }
-    case ODR_1600HZ_BW_145HZ: {
+    case ODR_1600HZ_BW_162HZ: {
       value = (0x08 << 4) | 0x0C;
       break;       
     }
-    case ODR_800HZ_BW_230HZ: {
+    case ODR_800HZ_BW_324HZ: {
       value = (0x0A << 4) | 0x0B;
       break;            
     }
-    case ODR_800HZ_BW_140HZ: {
+    case ODR_800HZ_BW_162HZ: {
       value = (0x09 << 4) | 0x0B;
       break;      
     }
@@ -697,15 +697,15 @@ bool Bmi088Accel::setOdr(Odr odr)
       value = (0x08 << 4) | 0x0B;
       break;           
     }
-    case ODR_400HZ_BW_145HZ: {
+    case ODR_400HZ_BW_162HZ: {
       value = (0x0A << 4) | 0x0A;
       break;      
     }
-    case ODR_400HZ_BW_75HZ: {
+    case ODR_400HZ_BW_80HZ: {
       value = (0x09 << 4) | 0x0A;
       break;          
     }
-    case ODR_400HZ_BW_40HZ: {
+    case ODR_400HZ_BW_41HZ: {
       value = (0x08 << 4) | 0x0A;
       break;    
     }
@@ -713,7 +713,7 @@ bool Bmi088Accel::setOdr(Odr odr)
       value = (0x0A << 4) | 0x09;
       break;       
     }
-    case ODR_200HZ_BW_38HZ: {
+    case ODR_200HZ_BW_41HZ: {
       value = (0x09 << 4) | 0x09;
       break;      
     }
@@ -725,7 +725,7 @@ bool Bmi088Accel::setOdr(Odr odr)
       value = (0x0A << 4) | 0x08;
       break;      
     }
-    case ODR_100HZ_BW_19HZ: {
+    case ODR_100HZ_BW_20HZ: {
       value = (0x09 << 4) | 0x08;
       break;      
     }
@@ -737,7 +737,7 @@ bool Bmi088Accel::setOdr(Odr odr)
       value = (0x0A << 4) | 0x07;
       break;      
     }
-    case ODR_50HZ_BW_9HZ: {
+    case ODR_50HZ_BW_10HZ: {
       value = (0x09 << 4) | 0x07;
       break;      
     }
@@ -761,7 +761,7 @@ bool Bmi088Accel::setOdr(Odr odr)
       value = (0x0A << 4) | 0x05;
       break;         
     }
-    case ODR_12_5HZ_BW_2HZ: {
+    case ODR_12_5HZ_BW_3HZ: {
       value = (0x09 << 4) | 0x05;
       break;         
     }
@@ -781,8 +781,8 @@ bool Bmi088Accel::setOdr(Odr odr)
   return (readReg == writeReg) ? true : false;
 }
 
-/* sets the BMI088 range */
-bool Bmi088Accel::setRange(Range range)
+/* sets the BMI085 range */
+bool Bmi085Accel::setRange(Range range)
 {
   uint8_t writeReg = 0, readReg = 0;
   readRegisters(ACC_RANGE_ADDR,1,&readReg);
@@ -792,20 +792,20 @@ bool Bmi088Accel::setRange(Range range)
   readRegisters(ACC_RANGE_ADDR,1,&readReg);
   if (readReg == writeReg) {
     switch (range) {
-      case RANGE_3G: {
-        accel_range_mss = 3.0f * G;
+      case RANGE_2G: {
+        accel_range_mss = 2.0f * G;
         break;
       }
-      case RANGE_6G: {
-        accel_range_mss = 6.0f * G;
+      case RANGE_4G: {
+        accel_range_mss = 4.0f * G;
         break;
       }
-      case RANGE_12G: {
-        accel_range_mss = 12.0f * G;
+      case RANGE_8G: {
+        accel_range_mss = 8.0f * G;
         break;
       }
-      case RANGE_24G: {
-        accel_range_mss = 24.0f * G;
+      case RANGE_16G: {
+        accel_range_mss = 16.0f * G;
         break;
       }      
     }
@@ -816,19 +816,19 @@ bool Bmi088Accel::setRange(Range range)
 }
 
 /* sets the Int1 pin configuration */
-bool Bmi088Accel::pinModeInt1(PinMode mode, PinLevel level)
+bool Bmi085Accel::pinModeInt1(PinMode mode, PinLevel level)
 {
   return pinModeInt1(PIN_OUTPUT,mode,level);
 }
 
 /* sets the Int2 pin configuration */
-bool Bmi088Accel::pinModeInt2(PinMode mode, PinLevel level)
+bool Bmi085Accel::pinModeInt2(PinMode mode, PinLevel level)
 {
   return pinModeInt2(PIN_OUTPUT,mode,level);
 }
 
 /* maps the data ready signal to the Int1 pin */
-bool Bmi088Accel::mapDrdyInt1(bool enable)
+bool Bmi085Accel::mapDrdyInt1(bool enable)
 {
   uint8_t writeReg = 0, readReg = 0;
   readRegisters(ACC_INT1_DRDY_ADDR,1,&readReg);
@@ -840,7 +840,7 @@ bool Bmi088Accel::mapDrdyInt1(bool enable)
 }
 
 /* maps the data ready signal to the Int2 pin */
-bool Bmi088Accel::mapDrdyInt2(bool enable)
+bool Bmi085Accel::mapDrdyInt2(bool enable)
 {
   uint8_t writeReg = 0, readReg = 0;
   readRegisters(ACC_INT2_DRDY_ADDR,1,&readReg);
@@ -852,15 +852,15 @@ bool Bmi088Accel::mapDrdyInt2(bool enable)
 }
 
 /* returns whether data is ready or not */
-bool Bmi088Accel::getDrdyStatus()
+bool Bmi085Accel::getDrdyStatus()
 {
   uint8_t readReg = 0;
   readRegisters(ACC_DRDY_ADDR,1,&readReg);
   return (GET_FIELD(ACC_DRDY,readReg)) ? true : false;
 }
 
-/* reads the BMI088 accel */
-void Bmi088Accel::readSensor()
+/* reads the BMI085 accel */
+void Bmi085Accel::readSensor()
 {
   /* accel data */
   uint16_t temp_uint11;
@@ -888,37 +888,37 @@ void Bmi088Accel::readSensor()
 }
 
 /* returns the x acceleration, m/s/s */
-float Bmi088Accel::getAccelX_mss()
+float Bmi085Accel::getAccelX_mss()
 {
   return accel_mss[0];
 }
 
 /* returns the y acceleration, m/s/s */
-float Bmi088Accel::getAccelY_mss()
+float Bmi085Accel::getAccelY_mss()
 {
   return accel_mss[1];
 }
 
 /* returns the z acceleration, m/s/s */
-float Bmi088Accel::getAccelZ_mss()
+float Bmi085Accel::getAccelZ_mss()
 {
   return accel_mss[2];
 }
 
 /* returns the temperature, C */
-float Bmi088Accel::getTemperature_C()
+float Bmi085Accel::getTemperature_C()
 {
   return temp_c;
 }
 
 /* returns the sensor time, ps */
-uint64_t Bmi088Accel::getTime_ps()
+uint64_t Bmi085Accel::getTime_ps()
 {
   return time_counter * 39062500;
 }
 
 /* sets the Int1 pin configuration */
-bool Bmi088Accel::pinModeInt1(PinIO io, PinMode mode, PinLevel level)
+bool Bmi085Accel::pinModeInt1(PinIO io, PinMode mode, PinLevel level)
 {
   uint8_t writeReg = 0, readReg = 0;
   uint8_t pin_io, pin_mode, active_lvl;
@@ -973,7 +973,7 @@ bool Bmi088Accel::pinModeInt1(PinIO io, PinMode mode, PinLevel level)
 }
 
 /* sets the Int2 pin configuration */
-bool Bmi088Accel::pinModeInt2(PinIO io, PinMode mode, PinLevel level)
+bool Bmi085Accel::pinModeInt2(PinIO io, PinMode mode, PinLevel level)
 {
   uint8_t writeReg = 0, readReg = 0;
   uint8_t pin_io, pin_mode, active_lvl;
@@ -1027,15 +1027,15 @@ bool Bmi088Accel::pinModeInt2(PinIO io, PinMode mode, PinLevel level)
   return (readReg == writeReg) ? true : false;  
 }
 
-/* performs BMI088 accel self test */
-bool Bmi088Accel::selfTest()
+/* performs BMI085 accel self test */
+bool Bmi085Accel::selfTest()
 {
   uint8_t writeReg = 0;
   float accel_pos_mg[3], accel_neg_mg[3];
-  /* set 24G range */
-  setRange(RANGE_24G);
+  /* set 16G range */
+  setRange(RANGE_16G);
   /* set 1.6 kHz ODR, 4x oversampling */
-  setOdr(ODR_1600HZ_BW_145HZ);
+  setOdr(ODR_1600HZ_BW_162HZ);
   /* wait >2 ms */
   delay(3);
   /* enable self test, positive polarity */
@@ -1072,7 +1072,7 @@ bool Bmi088Accel::selfTest()
 }
 
 /* sets whether the sensor is in active or suspend mode */
-bool Bmi088Accel::setMode(bool active)
+bool Bmi085Accel::setMode(bool active)
 {
   uint8_t writeReg = 0, readReg = 0;
   uint8_t value = (active) ? ACC_ACTIVE_MODE_CMD : ACC_SUSPEND_MODE_CMD;
@@ -1084,7 +1084,7 @@ bool Bmi088Accel::setMode(bool active)
 }
 
 /* sets whether the sensor is enabled or disabled */
-bool Bmi088Accel::setPower(bool enable)
+bool Bmi085Accel::setPower(bool enable)
 {
   uint8_t writeReg = 0, readReg = 0;
   uint8_t value = (enable) ? ACC_ENABLE_CMD : ACC_DISABLE_CMD;
@@ -1096,7 +1096,7 @@ bool Bmi088Accel::setPower(bool enable)
 }
 
 /* performs a soft reset */
-void Bmi088Accel::softReset()
+void Bmi085Accel::softReset()
 {
   uint8_t reg = 0;
   reg = SET_FIELD(reg,ACC_SOFT_RESET,ACC_RESET_CMD);
@@ -1108,32 +1108,32 @@ void Bmi088Accel::softReset()
   }
 }
 
-/* checks the BMI088 for configuration errors */
-bool Bmi088Accel::isConfigErr()
+/* checks the BMI085 for configuration errors */
+bool Bmi085Accel::isConfigErr()
 {
   uint8_t readReg = 0;
   readRegisters(ACC_ERR_CODE_ADDR,1,&readReg);
   return (GET_FIELD(ACC_ERR_CODE,readReg)) ? true : false;
 }
 
-/* checks the BMI088 for fatal errors */
-bool Bmi088Accel::isFatalErr()
+/* checks the BMI085 for fatal errors */
+bool Bmi085Accel::isFatalErr()
 {
   uint8_t readReg = 0;
   readRegisters(ACC_FATAL_ERR_ADDR,1,&readReg);
   return (GET_FIELD(ACC_FATAL_ERR,readReg)) ? true : false;
 }
 
-/* checks the BMI088 accelerometer ID */
-bool Bmi088Accel::isCorrectId()
+/* checks the BMI085 accelerometer ID */
+bool Bmi085Accel::isCorrectId()
 {
   uint8_t readReg = 0;
   readRegisters(ACC_CHIP_ID_ADDR,1,&readReg);
   return (GET_FIELD(ACC_CHIP_ID,readReg) == ACC_CHIP_ID) ? true : false;
 }
 
-/* writes a byte to BMI088 register given a register address and data */
-void Bmi088Accel::writeRegister(uint8_t subAddress, uint8_t data)
+/* writes a byte to BMI085 register given a register address and data */
+void Bmi085Accel::writeRegister(uint8_t subAddress, uint8_t data)
 {
   if (_useSPI) {
     _spi->beginTransaction(SPISettings(SPI_CLOCK, MSBFIRST, SPI_MODE0)); // begin the transaction
@@ -1150,8 +1150,8 @@ void Bmi088Accel::writeRegister(uint8_t subAddress, uint8_t data)
   }
 }
 
-/* writes multiple bytes to BMI088 register given a register address and data */
-void Bmi088Accel::writeRegisters(uint8_t subAddress, uint8_t count, const uint8_t* data)
+/* writes multiple bytes to BMI085 register given a register address and data */
+void Bmi085Accel::writeRegisters(uint8_t subAddress, uint8_t count, const uint8_t* data)
 {
   if (_useSPI) {
     _spi->beginTransaction(SPISettings(SPI_CLOCK, MSBFIRST, SPI_MODE0)); // begin the transaction
@@ -1172,8 +1172,8 @@ void Bmi088Accel::writeRegisters(uint8_t subAddress, uint8_t count, const uint8_
   }
 }
 
-/* reads registers from BMI088 given a starting register address, number of bytes, and a pointer to store data */
-void Bmi088Accel::readRegisters(uint8_t subAddress, uint8_t count, uint8_t* dest)
+/* reads registers from BMI085 given a starting register address, number of bytes, and a pointer to store data */
+void Bmi085Accel::readRegisters(uint8_t subAddress, uint8_t count, uint8_t* dest)
 {
   if (_useSPI) {
     _spi->beginTransaction(SPISettings(SPI_CLOCK, MSBFIRST, SPI_MODE0)); // begin the transaction
@@ -1200,24 +1200,24 @@ void Bmi088Accel::readRegisters(uint8_t subAddress, uint8_t count, uint8_t* dest
   }
 }
 
-/* BMI088 object, input the I2C bus and address */
-Bmi088Gyro::Bmi088Gyro(TwoWire &bus,uint8_t address)
+/* BMI085 object, input the I2C bus and address */
+Bmi085Gyro::Bmi085Gyro(TwoWire &bus,uint8_t address)
 {
   _i2c = &bus; // I2C bus
   _address = address; // I2C address
   _useSPI = false; // set to use I2C
 }
 
-/* BMI088 object, input the SPI bus and chip select pin */
-Bmi088Gyro::Bmi088Gyro(SPIClass &bus,uint8_t csPin)
+/* BMI085 object, input the SPI bus and chip select pin */
+Bmi085Gyro::Bmi085Gyro(SPIClass &bus,uint8_t csPin)
 {
   _spi = &bus; // SPI bus
   _csPin = csPin; // chip select pin
   _useSPI = true; // set to use SPI
 }
 
-/* begins communication with the BMI088 gyro */
-int Bmi088Gyro::begin()
+/* begins communication with the BMI085 gyro */
+int Bmi085Gyro::begin()
 {
   if (_useSPI) {
     // setting CS pin to output
@@ -1254,8 +1254,8 @@ int Bmi088Gyro::begin()
   return 1;
 }
 
-/* sets the BMI088 output data rate */
-bool Bmi088Gyro::setOdr(Odr odr)
+/* sets the BMI085 output data rate */
+bool Bmi085Gyro::setOdr(Odr odr)
 {
   uint8_t writeReg = 0, readReg = 0;
   writeReg = SET_FIELD(writeReg,GYRO_ODR,odr);
@@ -1265,8 +1265,8 @@ bool Bmi088Gyro::setOdr(Odr odr)
   return (readReg == writeReg) ? true : false;
 }
 
-/* sets the BMI088 range */
-bool Bmi088Gyro::setRange(Range range)
+/* sets the BMI085 range */
+bool Bmi085Gyro::setRange(Range range)
 {
   uint8_t writeReg = 0, readReg = 0;
   writeReg = SET_FIELD(writeReg,GYRO_RANGE,range);
@@ -1303,7 +1303,7 @@ bool Bmi088Gyro::setRange(Range range)
 }
 
 /* sets the Int3 pin configuration */
-bool Bmi088Gyro::pinModeInt3(PinMode mode, PinLevel level)
+bool Bmi085Gyro::pinModeInt3(PinMode mode, PinLevel level)
 {
   uint8_t writeReg = 0, readReg = 0;
   uint8_t pin_mode, active_lvl;
@@ -1344,7 +1344,7 @@ bool Bmi088Gyro::pinModeInt3(PinMode mode, PinLevel level)
 }
 
 /* sets the Int4 pin configuration */
-bool Bmi088Gyro::pinModeInt4(PinMode mode, PinLevel level)
+bool Bmi085Gyro::pinModeInt4(PinMode mode, PinLevel level)
 {
   uint8_t writeReg = 0, readReg = 0;
   uint8_t pin_mode, active_lvl;
@@ -1385,7 +1385,7 @@ bool Bmi088Gyro::pinModeInt4(PinMode mode, PinLevel level)
 }
 
 /* maps the data ready signal to the Int3 pin */
-bool Bmi088Gyro::mapDrdyInt3(bool enable)
+bool Bmi085Gyro::mapDrdyInt3(bool enable)
 {
   uint8_t writeReg = 0, readReg = 0;
   readRegisters(GYRO_INT3_DRDY_ADDR,1,&readReg);
@@ -1397,7 +1397,7 @@ bool Bmi088Gyro::mapDrdyInt3(bool enable)
 }
 
 /* maps the data ready signal to the Int4 pin */
-bool Bmi088Gyro::mapDrdyInt4(bool enable)
+bool Bmi085Gyro::mapDrdyInt4(bool enable)
 {
   uint8_t writeReg = 0, readReg = 0;
   readRegisters(GYRO_INT4_DRDY_ADDR,1,&readReg);
@@ -1409,15 +1409,15 @@ bool Bmi088Gyro::mapDrdyInt4(bool enable)
 }
 
 /* returns whether data is ready or not */
-bool Bmi088Gyro::getDrdyStatus()
+bool Bmi085Gyro::getDrdyStatus()
 {
   uint8_t readReg = 0;
   readRegisters(GYRO_DRDY_ADDR,1,&readReg);
   return (GET_FIELD(GYRO_DRDY,readReg)) ? true : false;
 }
 
-/* reads the BMI088 gyro */
-void Bmi088Gyro::readSensor()
+/* reads the BMI085 gyro */
+void Bmi085Gyro::readSensor()
 {
   /* accel data */
   int16_t gyro[3];
@@ -1431,30 +1431,30 @@ void Bmi088Gyro::readSensor()
 }
 
 /* returns the x gyro, rad/s */
-float Bmi088Gyro::getGyroX_rads()
+float Bmi085Gyro::getGyroX_rads()
 {
   return gyro_rads[0];
 }
 
 /* returns the y gyro, rad/s */
-float Bmi088Gyro::getGyroY_rads()
+float Bmi085Gyro::getGyroY_rads()
 {
   return gyro_rads[1];
 }
 
 /* returns the z gyro, rad/s */
-float Bmi088Gyro::getGyroZ_rads()
+float Bmi085Gyro::getGyroZ_rads()
 {
   return gyro_rads[2];
 }
 
-// bool Bmi088Gyro::selfTest()
+// bool Bmi085Gyro::selfTest()
 // {
 
 // }
 
 /* enables the new data interrupt */
-bool Bmi088Gyro::setDrdyInt(bool enable)
+bool Bmi085Gyro::setDrdyInt(bool enable)
 {
   uint8_t writeReg = 0, readReg = 0;
   uint8_t value = (enable) ? GYRO_ENABLE_DRDY_INT : GYRO_DIS_DRDY_INT;
@@ -1466,7 +1466,7 @@ bool Bmi088Gyro::setDrdyInt(bool enable)
 }
 
 /* performs a soft reset */
-void Bmi088Gyro::softReset()
+void Bmi085Gyro::softReset()
 {
   uint8_t reg = 0;
   reg = SET_FIELD(reg,GYRO_SOFT_RESET,GYRO_RESET_CMD);
@@ -1474,16 +1474,16 @@ void Bmi088Gyro::softReset()
   delay(50);
 }
 
-/* checks the BMI088 gyro ID */
-bool Bmi088Gyro::isCorrectId()
+/* checks the BMI085 gyro ID */
+bool Bmi085Gyro::isCorrectId()
 {
   uint8_t readReg = 0;
   readRegisters(GYRO_CHIP_ID_ADDR,1,&readReg);
   return (GET_FIELD(GYRO_CHIP_ID,readReg) == GYRO_CHIP_ID) ? true : false;
 }
 
-/* writes a byte to BMI088 register given a register address and data */
-void Bmi088Gyro::writeRegister(uint8_t subAddress, uint8_t data)
+/* writes a byte to BMI085 register given a register address and data */
+void Bmi085Gyro::writeRegister(uint8_t subAddress, uint8_t data)
 {
   if (_useSPI) {
     _spi->beginTransaction(SPISettings(SPI_CLOCK, MSBFIRST, SPI_MODE0)); // begin the transaction
@@ -1500,8 +1500,8 @@ void Bmi088Gyro::writeRegister(uint8_t subAddress, uint8_t data)
   }
 }
 
-/* reads registers from BMI088 given a starting register address, number of bytes, and a pointer to store data */
-void Bmi088Gyro::readRegisters(uint8_t subAddress, uint8_t count, uint8_t* dest)
+/* reads registers from BMI085 given a starting register address, number of bytes, and a pointer to store data */
+void Bmi085Gyro::readRegisters(uint8_t subAddress, uint8_t count, uint8_t* dest)
 {
   if (_useSPI) {
     _spi->beginTransaction(SPISettings(SPI_CLOCK, MSBFIRST, SPI_MODE0)); // begin the transaction
@@ -1523,21 +1523,21 @@ void Bmi088Gyro::readRegisters(uint8_t subAddress, uint8_t count, uint8_t* dest)
   }
 }
 
-/* BMI088 object, input the I2C bus and address */
-Bmi088::Bmi088(TwoWire &bus,uint8_t accel_addr,uint8_t gyro_addr)
+/* BMI085 object, input the I2C bus and address */
+Bmi085::Bmi085(TwoWire &bus,uint8_t accel_addr,uint8_t gyro_addr)
 {
-  accel = new Bmi088Accel(bus,accel_addr);
-  gyro = new Bmi088Gyro(bus,gyro_addr);
+  accel = new Bmi085Accel(bus,accel_addr);
+  gyro = new Bmi085Gyro(bus,gyro_addr);
 }
 
-/* BMI088 object, input the SPI bus and chip select pin */
-Bmi088::Bmi088(SPIClass &bus,uint8_t accel_cs,uint8_t gyro_cs)
+/* BMI085 object, input the SPI bus and chip select pin */
+Bmi085::Bmi085(SPIClass &bus,uint8_t accel_cs,uint8_t gyro_cs)
 {
-  accel = new Bmi088Accel(bus,accel_cs);
-  gyro = new Bmi088Gyro(bus,gyro_cs);
+  accel = new Bmi085Accel(bus,accel_cs);
+  gyro = new Bmi085Gyro(bus,gyro_cs);
 }
 
-int Bmi088::begin()
+int Bmi085::begin()
 {
   int status;
   // begin communication with each device
@@ -1572,45 +1572,45 @@ int Bmi088::begin()
   return 1;
 }
 
-bool Bmi088::setOdr(Odr odr)
+bool Bmi085::setOdr(Odr odr)
 {
   uint16_t feature_data;
   switch (odr) {
     case ODR_2000HZ: {
-      if (!accel->setOdr(Bmi088Accel::ODR_1600HZ_BW_280HZ)) {
+      if (!accel->setOdr(Bmi085Accel::ODR_1600HZ_BW_684HZ)) {
         return false;
       }
-      if (!gyro->setOdr(Bmi088Gyro::ODR_2000HZ_BW_230HZ)) {
+      if (!gyro->setOdr(Bmi085Gyro::ODR_2000HZ_BW_230HZ)) {
         return false;
       }
       feature_data = ACC_DATA_SYNC_MODE_2000HZ & ACC_DATA_SYNC_MODE_MASK;
       break;
     }
     case ODR_1000HZ: {
-      if (!accel->setOdr(Bmi088Accel::ODR_800HZ_BW_230HZ)) {
+      if (!accel->setOdr(Bmi085Accel::ODR_800HZ_BW_324HZ)) {
         return false;
       }
-      if (!gyro->setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) {
+      if (!gyro->setOdr(Bmi085Gyro::ODR_1000HZ_BW_116HZ)) {
         return false;
       }
       feature_data = ACC_DATA_SYNC_MODE_1000HZ & ACC_DATA_SYNC_MODE_MASK;
       break;
     }
     case ODR_400HZ: {
-      if (!accel->setOdr(Bmi088Accel::ODR_400HZ_BW_145HZ)) {
+      if (!accel->setOdr(Bmi085Accel::ODR_400HZ_BW_162HZ)) {
         return false;
       }
-      if (!gyro->setOdr(Bmi088Gyro::ODR_400HZ_BW_47HZ)) {
+      if (!gyro->setOdr(Bmi085Gyro::ODR_400HZ_BW_47HZ)) {
         return false;
       }
       feature_data = ACC_DATA_SYNC_MODE_400HZ & ACC_DATA_SYNC_MODE_MASK;
       break;
     }
     default: {
-      if (!accel->setOdr(Bmi088Accel::ODR_1600HZ_BW_280HZ)) {
+      if (!accel->setOdr(Bmi085Accel::ODR_1600HZ_BW_684HZ)) {
         return false;
       }
-      if (!gyro->setOdr(Bmi088Gyro::ODR_2000HZ_BW_230HZ)) {
+      if (!gyro->setOdr(Bmi085Gyro::ODR_2000HZ_BW_230HZ)) {
         return false;
       }
       feature_data = ACC_DATA_SYNC_MODE_2000HZ & ACC_DATA_SYNC_MODE_MASK;
@@ -1621,22 +1621,22 @@ bool Bmi088::setOdr(Odr odr)
   return true;
 }
 
-bool Bmi088::setRange(AccelRange accel_range,GyroRange gyro_range)
+bool Bmi085::setRange(AccelRange accel_range,GyroRange gyro_range)
 {
-  if (!accel->setRange((Bmi088Accel::Range)accel_range)) {
+  if (!accel->setRange((Bmi085Accel::Range)accel_range)) {
     return false;
   }
-  if (!gyro->setRange((Bmi088Gyro::Range)gyro_range)) {
+  if (!gyro->setRange((Bmi085Gyro::Range)gyro_range)) {
     return false;
   }
   return true;
 }
 
-bool Bmi088::mapDrdy(DrdyPin pin)
+bool Bmi085::mapDrdy(DrdyPin pin)
 {
   switch (pin) {
     case PIN_1: {
-      if(!accel->pinModeInt2(Bmi088Accel::PIN_INPUT,Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH)) {
+      if(!accel->pinModeInt2(Bmi085Accel::PIN_INPUT,Bmi085Accel::PUSH_PULL,Bmi085Accel::ACTIVE_HIGH)) {
         return false;
       }
       accel->writeRegister(ACC_INT1_MAP_ADDR,ACC_INTA_ENABLE);
@@ -1644,7 +1644,7 @@ bool Bmi088::mapDrdy(DrdyPin pin)
       return true;
     }
     case PIN_2: {
-      if(!accel->pinModeInt1(Bmi088Accel::PIN_INPUT,Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH)) {
+      if(!accel->pinModeInt1(Bmi085Accel::PIN_INPUT,Bmi085Accel::PUSH_PULL,Bmi085Accel::ACTIVE_HIGH)) {
         return false;
       }
       accel->writeRegister(ACC_INT2_MAP_ADDR,ACC_INTA_ENABLE);
@@ -1652,7 +1652,7 @@ bool Bmi088::mapDrdy(DrdyPin pin)
       return true;
     }
     default: {
-      if(!accel->pinModeInt1(Bmi088Accel::PIN_INPUT,Bmi088Accel::PUSH_PULL,Bmi088Accel::ACTIVE_HIGH)) {
+      if(!accel->pinModeInt1(Bmi085Accel::PIN_INPUT,Bmi085Accel::PUSH_PULL,Bmi085Accel::ACTIVE_HIGH)) {
         return false;
       }
       accel->writeRegister(ACC_INT2_MAP_ADDR,ACC_INTA_ENABLE);
@@ -1662,23 +1662,23 @@ bool Bmi088::mapDrdy(DrdyPin pin)
   }
 }
 
-bool Bmi088::pinModeDrdy(PinMode mode, PinLevel level)
+bool Bmi085::pinModeDrdy(PinMode mode, PinLevel level)
 {
   switch (drdy_pin) {
     case 1: {
-      if(!accel->pinModeInt1((Bmi088Accel::PinMode)mode,(Bmi088Accel::PinLevel)level)) {
+      if(!accel->pinModeInt1((Bmi085Accel::PinMode)mode,(Bmi085Accel::PinLevel)level)) {
         return false;
       }  
       return true;
     }
     case 2: {
-      if(!accel->pinModeInt2((Bmi088Accel::PinMode)mode,(Bmi088Accel::PinLevel)level)) {
+      if(!accel->pinModeInt2((Bmi085Accel::PinMode)mode,(Bmi085Accel::PinLevel)level)) {
         return false;
       }  
       return true;
     }
     default: {
-      if(!accel->pinModeInt2((Bmi088Accel::PinMode)mode,(Bmi088Accel::PinLevel)level)) {
+      if(!accel->pinModeInt2((Bmi085Accel::PinMode)mode,(Bmi085Accel::PinLevel)level)) {
         return false;
       }  
       return true;
@@ -1686,11 +1686,11 @@ bool Bmi088::pinModeDrdy(PinMode mode, PinLevel level)
   }
 }
 
-bool Bmi088::mapSync(SyncPin pin)
+bool Bmi085::mapSync(SyncPin pin)
 {
   switch (pin) {
     case PIN_3: {
-      if (!gyro->pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH)) {
+      if (!gyro->pinModeInt3(Bmi085Gyro::PUSH_PULL,Bmi085Gyro::ACTIVE_HIGH)) {
         return false;
       }
       if (!gyro->mapDrdyInt3(true)) {
@@ -1699,7 +1699,7 @@ bool Bmi088::mapSync(SyncPin pin)
       return true;
     }
     case PIN_4: {
-      if (!gyro->pinModeInt4(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH)) {
+      if (!gyro->pinModeInt4(Bmi085Gyro::PUSH_PULL,Bmi085Gyro::ACTIVE_HIGH)) {
         return false;
       }
       if (!gyro->mapDrdyInt4(true)) {
@@ -1708,7 +1708,7 @@ bool Bmi088::mapSync(SyncPin pin)
       return true;
     }
     default: {
-      if (!gyro->pinModeInt3(Bmi088Gyro::PUSH_PULL,Bmi088Gyro::ACTIVE_HIGH)) {
+      if (!gyro->pinModeInt3(Bmi085Gyro::PUSH_PULL,Bmi085Gyro::ACTIVE_HIGH)) {
         return false;
       }
       if (!gyro->mapDrdyInt3(true)) {
@@ -1719,53 +1719,53 @@ bool Bmi088::mapSync(SyncPin pin)
   }  
 }
 
-void Bmi088::readSensor()
+void Bmi085::readSensor()
 {
   accel->readSensor();
   gyro->readSensor();
 }
 
-float Bmi088::getAccelX_mss()
+float Bmi085::getAccelX_mss()
 {
   return accel->getAccelX_mss();
 }
 
-float Bmi088::getAccelY_mss()
+float Bmi085::getAccelY_mss()
 {
   return accel->getAccelY_mss();
 }
 
-float Bmi088::getAccelZ_mss()
+float Bmi085::getAccelZ_mss()
 {
   return accel->getAccelZ_mss();
 }
 
-float Bmi088::getTemperature_C()
+float Bmi085::getTemperature_C()
 {
   return accel->getTemperature_C();
 }
 
-uint64_t Bmi088::getTime_ps()
+uint64_t Bmi085::getTime_ps()
 {
   return accel->getTime_ps();
 }
 
-float Bmi088::getGyroX_rads()
+float Bmi085::getGyroX_rads()
 {
   return gyro->getGyroX_rads();
 }
 
-float Bmi088::getGyroY_rads()
+float Bmi085::getGyroY_rads()
 {
   return gyro->getGyroY_rads();
 }
 
-float Bmi088::getGyroZ_rads()
+float Bmi085::getGyroZ_rads()
 {
   return gyro->getGyroZ_rads();
 }
 
-bool Bmi088::writeFeatureConfig()
+bool Bmi085::writeFeatureConfig()
 {
   uint16_t index = 0;
   uint8_t lsb, msb, status;
@@ -1794,7 +1794,7 @@ bool Bmi088::writeFeatureConfig()
   return (status == 1) ? true : false;
 }
 
-void Bmi088::updateFeatureConfig(uint8_t addr, uint8_t count, const uint16_t *data)
+void Bmi085::updateFeatureConfig(uint8_t addr, uint8_t count, const uint16_t *data)
 {
   uint16_t read_length = (addr * 2) + (count * 2);
 	uint8_t feature_data[read_length];
